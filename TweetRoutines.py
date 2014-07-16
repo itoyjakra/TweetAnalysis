@@ -1,16 +1,6 @@
 import sys
 import json
-
-states = {
-        'AK': 'Alaska', 'AL': 'Alabama', 'AR': 'Arkansas', 'AS': 'American Samoa', 'AZ': 'Arizona', 'CA': 'California', 'CO': 'Colorado',
-        'CT': 'Connecticut', 'DC': 'District of Columbia', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia', 'GU': 'Guam', 'HI': 'Hawaii',
-        'IA': 'Iowa', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'MA': 'Massachusetts',
-        'MD': 'Maryland', 'ME': 'Maine', 'MI': 'Michigan', 'MN': 'Minnesota', 'MO': 'Missouri', 'MP': 'Northern Mariana Islands', 'MS': 'Mississippi',
-        'MT': 'Montana', 'NA': 'National', 'NC': 'North Carolina', 'ND': 'North Dakota', 'NE': 'Nebraska', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
-        'NM': 'New Mexico', 'NV': 'Nevada', 'NY': 'New York', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'PR': 'Puerto Rico',
-        'RI': 'Rhode Island', 'SC': 'South Carolina', 'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VA': 'Virginia', 'VI': 'Virgin Islands',
-        'VT': 'Vermont', 'WA': 'Washington', 'WI': 'Wisconsin', 'WV': 'West Virginia', 'WY': 'Wyoming'
-}
+from USstates import states 
 
 def getStateAbbr(stateName):
     '''
@@ -75,6 +65,53 @@ def getStateScore(fileName, sents):
     ftweet.close()
 
     return stateScore
+
+def getTopTags(d, n):
+    '''
+    return the top n most frequent words in a dictionary
+    '''
+    sword = [ w for w in sorted(d, key=d.get, reverse=True)[:n] ]
+    sfreq = [ d[w] for w in sorted(d, key=d.get, reverse=True)[:n] ]
+    return zip(sword, sfreq)
+
+def createHashtagDict(fileName):
+    '''
+    create a dictionary of tweet hashtags from a collection of tweets
+    '''
+    ftweet = open(fileName, "r")
+    hashTagFreq = {}
+    for line in ftweet:
+        x = json.loads(line)
+        if 'entities' in x.keys():
+            tag = x['entities']['hashtags']
+            if len(tag) > 0:
+                text = tag[0]['text']
+                if text in hashTagFreq.keys():
+                    hashTagFreq[text] += 1
+                else:
+                    hashTagFreq[text] = 1
+        
+    return hashTagFreq
+
+def getWordFreq(fileName):
+    '''
+    get frequency of words from a file of tweets
+    '''
+    ftweet = open(fileName, "r")
+    wFreq = {}
+    for line in ftweet:
+        x = json.loads(line)
+        if 'text' in x.keys():
+            text = x['text'].strip()
+            for word in text.split():
+                word = word.strip()
+                if word in wFreq.keys():
+                    wFreq[word] += 1
+                else:
+                    wFreq[word] = 1
+    ftweet.close()
+        
+    return wFreq
 
 def storeSentiment(fileName):
     '''
