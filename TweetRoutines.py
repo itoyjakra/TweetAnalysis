@@ -2,6 +2,16 @@ import sys
 import json
 from USstates import states 
 
+def createInvertedStateDict(states):
+    '''
+    created a dictionary where the state name is key and the abbreviation is value
+    '''
+    invertedStates = {}
+    for key, value in states.iteritems():
+        invertedStaes[value] = key
+    return invertedStates
+
+
 def getStateAbbr(stateName):
     '''
     returns the state abbreviation corresponding to a state name
